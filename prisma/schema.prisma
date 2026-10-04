@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  passwordHash  String
+  name          String?
+  createdAt     DateTime        @default(now())
+  resumes       Resume[]
+  searches      JobSearch[]
+  matches       MatchAnalysis[]
+  coachQAs      CoachQA[]
+  coachProfile  CoachProfile?
+  demandReports DemandReport[]
+}
+
+model Resume {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename    String
+  text        String
+  profileJson String
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model JobSearch {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location    String
+  remoteOnly  Boolean  @default(false)
+  jobType     String?
+  resultsJson String
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model MatchAnalysis {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jdText       String
+  jobUrl       String?
+  analysisJson String
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CoachQA {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question     String
+  category     String
+  answer       String
+  feedbackJson String
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CoachProfile {
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learnedJson String
+  updatedAt   DateTime @updatedAt
+}
+
+model DemandReport {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportJson String
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
