@@ -14,7 +14,7 @@ Resume → LLM profile extraction → free job-API search + JD match scoring. Ne
 
 ### Commands
 - `npm run dev` — dev server
-- `npm run build` / `npm run lint` / `npx tsc --noEmit` — verification
+- `npm run build` / `npm run lint` / `npx tsc --noEmit` / `npm test` — verification (vitest, `lib/**/*.test.ts`)
 - `npx prisma migrate dev` — after schema changes
 - npm `allowScripts` is enforced — approve install scripts via `npm approve-scripts <pkg>` if a package fails to set up (Prisma engines need this)
 
