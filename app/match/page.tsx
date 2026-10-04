@@ -98,6 +98,20 @@ export default function MatchPage() {
       {analysis && (
         <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
           <MatchResultView analysis={analysis} />
+          <div className="mt-4 border-t border-zinc-100 pt-4">
+            <Link
+              href="/tailor"
+              onClick={() =>
+                sessionStorage.setItem(
+                  "job-seeker:tailor-draft",
+                  JSON.stringify({ jobTitle: "", jobUrl, jdText })
+                )
+              }
+              className="inline-block rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+            >
+              Generate a tailored resume for this job
+            </Link>
+          </div>
         </div>
       )}
     </div>

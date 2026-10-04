@@ -22,6 +22,9 @@ export default async function Nav() {
           <Link href="/match" className="text-zinc-600 hover:text-zinc-900">
             Match a JD
           </Link>
+          <Link href="/tailor" className="text-zinc-600 hover:text-zinc-900">
+            Tailor
+          </Link>
           <Link href="/coach" className="text-zinc-600 hover:text-zinc-900">
             Coach
           </Link>

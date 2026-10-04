@@ -20,7 +20,7 @@ export default async function HistoryPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [searches, matches] = await Promise.all([
+  const [searches, matches, tailored] = await Promise.all([
     prisma.jobSearch.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
@@ -29,6 +29,11 @@ export default async function HistoryPage() {
     prisma.matchAnalysis.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
+      take: 25,
+    }),
+    prisma.tailoredResume.findMany({
+      where: { userId: session.user.id },
+      orderBy: { updatedAt: "desc" },
       take: 25,
     }),
   ]);
@@ -111,6 +116,52 @@ export default async function HistoryPage() {
                   </div>
                   <p className="mt-1 text-sm text-zinc-600">{a.summary}</p>
                   <p className="mt-1 line-clamp-1 text-xs text-zinc-400">{m.jdText}</p>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-lg font-medium">Tailored resumes</h2>
+        {tailored.length === 0 ? (
+          <p className="text-sm text-zinc-500">No tailored resumes yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {tailored.map((t) => {
+              const evaluation = t.evaluationJson
+                ? (JSON.parse(t.evaluationJson) as StoredAnalysis)
+                : null;
+              return (
+                <li key={t.id} className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">
+                      {t.jobTitle || "Untitled resume"}
+                      {evaluation && (
+                        <span className="ml-2 text-zinc-500">
+                          — {evaluation.score}% {evaluation.verdict}
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-zinc-400">
+                      {new Date(t.updatedAt).toLocaleString()}
+                      {t.jobUrl && (
+                        <>
+                          {" · "}
+                          <a
+                            href={t.jobUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                          >
+                            listing
+                          </a>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                  <p className="mt-1 line-clamp-1 text-xs text-zinc-400">{t.jdText}</p>
                 </li>
               );
             })}

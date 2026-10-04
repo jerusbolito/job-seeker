@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAppStore } from "@/lib/store";
 import type { NormalizedJob } from "@/lib/types";
 import MatchResultView, { type MatchAnalysisData } from "./MatchResultView";
@@ -99,6 +100,22 @@ export default function JobCard({ job }: { job: RankedJob }) {
         >
           {analyzing ? "Analyzing…" : analysis ? (expanded ? "Hide analysis" : "Show analysis") : "Analyze fit"}
         </button>
+        <Link
+          href="/tailor"
+          onClick={() =>
+            sessionStorage.setItem(
+              "job-seeker:tailor-draft",
+              JSON.stringify({
+                jobTitle: `${job.title} — ${job.company}`,
+                jobUrl: job.url,
+                jdText: `${job.title} at ${job.company} (${job.location})\n\n${job.description}`,
+              })
+            )
+          }
+          className="rounded-md border border-zinc-300 px-3 py-1 hover:bg-zinc-50"
+        >
+          Tailor resume
+        </Link>
         {job.postedAt && (
           <span className="text-xs text-zinc-400">
             posted {new Date(job.postedAt).toLocaleDateString()}

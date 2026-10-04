@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-const PROTECTED = ["/dashboard", "/jobs", "/match", "/history", "/coach"];
+const PROTECTED = ["/dashboard", "/jobs", "/match", "/tailor", "/history", "/coach"];
 const AUTH_PAGES = ["/login", "/register"];
 
 export default auth((req) => {
@@ -22,5 +22,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/jobs/:path*", "/match/:path*", "/history/:path*", "/coach/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/jobs/:path*", "/match/:path*", "/tailor/:path*", "/history/:path*", "/coach/:path*", "/login", "/register"],
 };

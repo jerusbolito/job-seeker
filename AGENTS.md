@@ -22,7 +22,9 @@ Resume → LLM profile extraction → free job-API search + JD match scoring. Ne
 - `lib/llm.ts` — provider factory (platform-agnostic, user's own key) + `extractProfile`
 - `lib/jobs/` — free providers (Remotive, RemoteOK, Arbeitnow, Jobicy) + aggregator (normalize, dedupe, location filter)
 - `lib/agent.ts` — query planning → aggregation → LLM ranking (2-stage, no tool-calling required)
-- `lib/matcher.ts` — resume vs JD analysis
+- `lib/matcher.ts` — resume vs JD analysis (also used to evaluate tailored resumes)
+- `lib/tailor.ts` + `lib/markdown.ts` — tailored resume generation (markdown output) + dependency-free renderer for preview/download/print
+- `app/tailor/` + `app/api/tailor/` — tailor-a-resume flow: gap questions (`/questions`, user answers prevent fabrication) → generate → edit → evaluate → download (.md/.html/print-PDF). JobCard/match page hand off JDs via sessionStorage key `job-seeker:tailor-draft`
 - `lib/coach.ts` — interview Q&A (learn + practice), learned-profile merge, market demand scan
 - `proxy.ts` — route protection (Next 16 convention, replaces middleware.ts)
 - User LLM keys are session-only: zustand + sessionStorage, sent per request, never persisted

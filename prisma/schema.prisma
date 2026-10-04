@@ -19,6 +19,7 @@ model User {
   coachQAs      CoachQA[]
   coachProfile  CoachProfile?
   demandReports DemandReport[]
+  tailored      TailoredResume[]
 }
 
 model Resume {
@@ -76,6 +77,23 @@ model CoachProfile {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   learnedJson String
   updatedAt   DateTime @updatedAt
+}
+
+model TailoredResume {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle       String?
+  jobUrl         String?
+  jdText         String
+  content        String
+  changesJson    String
+  qaJson         String?
+  evaluationJson String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model DemandReport {
