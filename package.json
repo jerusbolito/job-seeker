@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "node scripts/setup.mjs",
+    "postinstall": "npm run setup",
+    "predev": "node scripts/setup.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.71",
