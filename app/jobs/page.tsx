@@ -51,7 +51,7 @@ export default function JobsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Find jobs</h1>
+        <h1 className="font-serif text-2xl font-semibold tracking-tight">Find jobs</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Your LLM generates search queries from your resume profile, we query free
           job APIs (Remotive, RemoteOK, Arbeitnow, Jobicy), then rank the results.
@@ -59,7 +59,7 @@ export default function JobsPage() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
             <span className="mb-1 block text-zinc-500">Preferred location</span>
@@ -91,7 +91,7 @@ export default function JobsPage() {
           <button
             onClick={search}
             disabled={busy || !resumeId}
-            className="rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+            className="rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
           >
             {busy ? "Searching…" : "Find jobs"}
           </button>
@@ -108,7 +108,7 @@ export default function JobsPage() {
       </div>
 
       {busy && (
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-600 shadow-sm">
+        <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-600 shadow-sm">
           Generating queries → searching providers → ranking matches. This can take
           20–60 seconds depending on your model.
         </div>
@@ -137,7 +137,7 @@ export default function JobsPage() {
           </div>
 
           {result.jobs.length === 0 ? (
-            <p className="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-600 shadow-sm">
+            <p className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-600 shadow-sm">
               No matching jobs found. Try broadening the location (e.g. &quot;Remote&quot;
               or a larger metro) or uploading a more detailed resume.
             </p>

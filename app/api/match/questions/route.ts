@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { analyzeMatch } from "@/lib/matcher";
+import { findPositioningQuestions } from "@/lib/matcher";
 import type { LlmSettings } from "@/lib/types";
 import type { ResumeProfile } from "@/lib/llm";
 
@@ -16,12 +16,7 @@ const schema = z.object({
     model: z.string(),
   }),
   jdText: z.string().min(50, "Paste a full job description (50+ characters)."),
-  jobUrl: z.url().optional().or(z.literal("")),
   resumeId: z.string().optional(),
-  answers: z
-    .array(z.object({ question: z.string(), answer: z.string() }))
-    .max(10)
-    .optional(),
 });
 
 export async function POST(req: Request) {
@@ -35,7 +30,7 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  const { llm, jdText, jobUrl, resumeId, answers } = parsed.data;
+  const { llm, jdText, resumeId } = parsed.data;
 
   const resume = resumeId
     ? await prisma.resume.findFirst({ where: { id: resumeId, userId } })
@@ -46,49 +41,17 @@ export async function POST(req: Request) {
 
   try {
     const profile = JSON.parse(resume.profileJson) as ResumeProfile;
-    const answered = (answers ?? []).filter((a) => a.answer.trim());
-    const analysis = await analyzeMatch(
+    const questions = await findPositioningQuestions(
       profile,
       resume.text,
       jdText,
-      llm as LlmSettings,
-      answered
+      llm as LlmSettings
     );
-
-    const record = await prisma.matchAnalysis.create({
-      data: {
-        userId,
-        jdText,
-        jobUrl: jobUrl || null,
-        analysisJson: JSON.stringify(analysis),
-      },
-    });
-
-    return NextResponse.json({ id: record.id, analysis });
+    return NextResponse.json({ questions });
   } catch (e) {
     return NextResponse.json(
-      { error: `Analysis failed: ${e instanceof Error ? e.message : "unknown error"}` },
+      { error: `Question generation failed: ${e instanceof Error ? e.message : "unknown error"}` },
       { status: 502 }
     );
   }
-}
-
-export async function GET() {
-  const userId = await requireUserId();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const matches = await prisma.matchAnalysis.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-  return NextResponse.json(
-    matches.map((m) => ({
-      id: m.id,
-      jobUrl: m.jobUrl,
-      jdPreview: m.jdText.slice(0, 200),
-      analysis: JSON.parse(m.analysisJson),
-      createdAt: m.createdAt,
-    }))
-  );
 }

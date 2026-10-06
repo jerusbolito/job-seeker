@@ -180,7 +180,7 @@ export default function CoachPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Coach</h1>
+        <h1 className="font-serif text-2xl font-semibold tracking-tight">Coach</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Answer interview questions — the app learns about you, scores your
           answers, and compares your skills against what the market is asking for.
@@ -203,7 +203,7 @@ export default function CoachPage() {
         </p>
       )}
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Interview practice</h2>
           {data && data.questionCount > 0 && (
@@ -222,7 +222,7 @@ export default function CoachPage() {
             <button
               onClick={getQuestion}
               disabled={!ready || busyQ}
-              className="mt-3 rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="mt-3 rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
             >
               {busyQ ? "Thinking…" : "Ask me a question"}
             </button>
@@ -255,7 +255,7 @@ export default function CoachPage() {
               <button
                 onClick={submitAnswer}
                 disabled={busyA || answer.trim().length < 10}
-                className="rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+                className="rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
               >
                 {busyA ? "Evaluating…" : "Submit answer"}
               </button>
@@ -308,13 +308,13 @@ export default function CoachPage() {
         )}
       </section>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Skills radar</h2>
           <button
             onClick={() => scanDemand(!!report)}
             disabled={!ready || busyD}
-            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
           >
             {busyD ? "Scanning…" : report ? "Re-scan market" : "Scan market demand"}
           </button>
@@ -393,7 +393,7 @@ export default function CoachPage() {
                 <ul className="space-y-2">
                   {report.recommendations.map((r, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="mt-0.5 rounded-md bg-zinc-900 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
+                      <span className="mt-0.5 rounded-md bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
                         {TYPE_LABELS[r.type] ?? r.type}
                       </span>
                       <span className="text-zinc-700">{r.text}</span>
@@ -410,7 +410,7 @@ export default function CoachPage() {
         (learned.skills.length > 0 ||
           learned.preferences.length > 0 ||
           learned.facts.length > 0) && (
-          <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-medium">What we&apos;ve learned about you</h2>
             <div className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
               <div>

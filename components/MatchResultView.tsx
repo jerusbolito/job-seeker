@@ -8,6 +8,12 @@ interface Suggestion {
 export interface MatchAnalysisData {
   score: number;
   verdict: "strong" | "good" | "fair" | "weak";
+  subscores?: {
+    skillsMatch: number;
+    experienceMatch: number;
+    seniorityFit: number;
+    keywordCoverage: number;
+  };
   summary: string;
   matchedSkills: string[];
   missingSkills: string[];
@@ -48,6 +54,38 @@ export default function MatchResultView({ analysis: a }: { analysis: MatchAnalys
           <p className="mt-1 text-sm text-zinc-600">{a.summary}</p>
         </div>
       </div>
+
+      {a.subscores && (
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
+          {(
+            [
+              ["Skills", a.subscores.skillsMatch],
+              ["Experience", a.subscores.experienceMatch],
+              ["Seniority", a.subscores.seniorityFit],
+              ["Keywords", a.subscores.keywordCoverage],
+            ] as const
+          ).map(([label, value]) => (
+            <div key={label}>
+              <div className="flex items-baseline justify-between text-xs">
+                <span className="text-zinc-500">{label}</span>
+                <span className="font-medium">{value}</span>
+              </div>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-100">
+                <div
+                  className={`h-full rounded-full ${
+                    value >= 75
+                      ? "bg-green-500"
+                      : value >= 50
+                        ? "bg-amber-400"
+                        : "bg-red-400"
+                  }`}
+                  style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
@@ -101,7 +139,7 @@ export default function MatchResultView({ analysis: a }: { analysis: MatchAnalys
             .map((s, i) => (
             <li key={i} className="rounded-lg bg-zinc-50 p-4 text-sm">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-zinc-900 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
+                <span className="rounded-md bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
                   {s.section}
                 </span>
                 <span className="text-zinc-500">{s.why}</span>

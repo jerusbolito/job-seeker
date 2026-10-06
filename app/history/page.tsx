@@ -40,7 +40,7 @@ export default async function HistoryPage() {
 
   return (
     <div className="space-y-10">
-      <h1 className="text-2xl font-semibold">History</h1>
+      <h1 className="font-serif text-2xl font-semibold tracking-tight">History</h1>
 
       <section>
         <h2 className="mb-3 text-lg font-medium">Job searches</h2>
@@ -51,7 +51,7 @@ export default async function HistoryPage() {
             {searches.map((s) => {
               const r = JSON.parse(s.resultsJson) as StoredResult;
               return (
-                <li key={s.id} className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+                <li key={s.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">
                       {s.location || "Anywhere"}
@@ -92,7 +92,7 @@ export default async function HistoryPage() {
             {matches.map((m) => {
               const a = JSON.parse(m.analysisJson) as StoredAnalysis;
               return (
-                <li key={m.id} className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+                <li key={m.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">
                       {a.score}% — {a.verdict}
@@ -134,7 +134,7 @@ export default async function HistoryPage() {
                 ? (JSON.parse(t.evaluationJson) as StoredAnalysis)
                 : null;
               return (
-                <li key={t.id} className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+                <li key={t.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">
                       {t.jobTitle || "Untitled resume"}

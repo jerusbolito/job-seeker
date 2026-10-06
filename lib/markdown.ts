@@ -76,7 +76,8 @@ const RESUME_CSS = `
   a { color: inherit; }
   hr { border: none; border-top: 1px solid #d4d4d8; margin: 16px 0; }
   code { font-family: inherit; }
-  @media print { body { padding: 0; } }
+  @page { margin: 0; }
+  @media print { body { padding: 24px 28px; } }
 `;
 
 export function markdownToHtmlDocument(markdown: string, title = "Resume"): string {

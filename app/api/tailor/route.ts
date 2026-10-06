@@ -72,6 +72,7 @@ export async function POST(req: Request) {
       id: record.id,
       content: tailored.markdown,
       changes: tailored.changes,
+      warnings: tailored.warnings,
     });
   } catch (e) {
     return NextResponse.json(

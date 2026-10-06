@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { findGapQuestions } from "@/lib/tailor";
+import { findGapQuestions, filterAnsweredQuestions } from "@/lib/tailor";
 import type { LlmSettings } from "@/lib/types";
 import type { ResumeProfile } from "@/lib/llm";
 
@@ -17,6 +17,10 @@ const schema = z.object({
   }),
   jdText: z.string().min(50, "Paste a full job description (50+ characters)."),
   resumeId: z.string().optional(),
+  priorAnswers: z
+    .array(z.object({ question: z.string(), answer: z.string() }))
+    .max(10)
+    .optional(),
 });
 
 export async function POST(req: Request) {
@@ -30,7 +34,7 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  const { llm, jdText, resumeId } = parsed.data;
+  const { llm, jdText, resumeId, priorAnswers } = parsed.data;
 
   const resume = resumeId
     ? await prisma.resume.findFirst({ where: { id: resumeId, userId } })
@@ -41,8 +45,15 @@ export async function POST(req: Request) {
 
   try {
     const profile = JSON.parse(resume.profileJson) as ResumeProfile;
-    const questions = await findGapQuestions(profile, resume.text, jdText, llm as LlmSettings);
-    return NextResponse.json({ questions });
+    const prior = (priorAnswers ?? []).filter((a) => a.answer.trim());
+    const questions = await findGapQuestions(
+      profile,
+      resume.text,
+      jdText,
+      llm as LlmSettings,
+      prior
+    );
+    return NextResponse.json({ questions: filterAnsweredQuestions(questions, prior) });
   } catch (e) {
     return NextResponse.json(
       { error: `Gap analysis failed: ${e instanceof Error ? e.message : "unknown error"}` },

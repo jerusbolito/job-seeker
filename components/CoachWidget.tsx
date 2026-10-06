@@ -24,7 +24,7 @@ export default function CoachWidget() {
   const answered = data?.questionCount ?? 0;
 
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-medium">Coach</h2>
         <Link href="/coach" className="text-sm text-zinc-500 underline hover:text-zinc-900">
@@ -51,7 +51,7 @@ export default function CoachWidget() {
           <ul className="mt-2 space-y-2">
             {recs.map((r, i) => (
               <li key={i} className="flex items-start gap-2 text-sm">
-                <span className="mt-0.5 rounded-md bg-zinc-900 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
+                <span className="mt-0.5 rounded-md bg-accent px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
                   {r.type}
                 </span>
                 <span className="text-zinc-700">{r.text}</span>

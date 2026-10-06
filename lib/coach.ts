@@ -1,6 +1,5 @@
-import { generateObject } from "ai";
 import { z } from "zod";
-import { getModel, withSchemaPrompt, type ResumeProfile } from "./llm";
+import { generateStructured, type ResumeProfile } from "./llm";
 import { searchAllProviders } from "./jobs/aggregator";
 import { truncate } from "./jobs/util";
 import type { LlmSettings } from "./types";
@@ -86,12 +85,10 @@ export async function nextQuestion(
   gapSkills: string[],
   settings: LlmSettings
 ): Promise<CoachQuestion> {
-  const { object } = await generateObject({
-    model: getModel(settings),
+  const object = await generateStructured({
+    settings,
     schema: questionSchema,
-    prompt: withSchemaPrompt(
-      questionSchema,
-      settings.provider,
+    prompt:
       `You are an interview coach. Generate ONE interview question for this candidate and return it as JSON. Rotate between categories: "behavioral" (STAR-style), "technical" (probe depth on a claimed skill), and "discovery" (uncover achievements, projects, or preferences not on the resume so the app can learn more about them).
 
 Rules:
@@ -113,8 +110,7 @@ ${JSON.stringify(learned)}
 Market gap skills: ${gapSkills.slice(0, 8).join(", ") || "unknown"}
 
 Already asked (most recent last):
-${JSON.stringify(recentQA.map((q) => ({ q: q.question, score: q.score })))}`
-    ),
+${JSON.stringify(recentQA.map((q) => ({ q: q.question, score: q.score })))}`,
   });
   return object;
 }
@@ -146,12 +142,10 @@ export async function evaluateAnswer(
   profile: ResumeProfile,
   settings: LlmSettings
 ): Promise<AnswerEvaluation> {
-  const { object } = await generateObject({
-    model: getModel(settings),
+  const object = await generateStructured({
+    settings,
     schema: evaluationSchema,
-    prompt: withSchemaPrompt(
-      evaluationSchema,
-      settings.provider,
+    prompt:
       `You are an honest interview coach. Evaluate this ${category} interview answer and return the evaluation as JSON. Score like a real hiring panel — don't inflate. Give concrete improvements, not generic advice. Then extract everything the answer reveals about the candidate: skills/tools demonstrated, work preferences, and resume-worthy facts (projects, achievements, quantified impact).
 
 Candidate context (for calibration only):
@@ -160,8 +154,7 @@ ${JSON.stringify({ seniority: profile.seniority, roles: profile.roles.slice(0, 6
 QUESTION: ${question}
 
 ANSWER:
-${answer.slice(0, 4000)}`
-    ),
+${answer.slice(0, 4000)}`,
   });
   return object;
 }
@@ -211,7 +204,6 @@ export async function scanDemand(
   learned: LearnedProfile,
   settings: LlmSettings
 ): Promise<DemandResult> {
-  const model = getModel(settings);
   const queries = profile.roles.slice(0, 4).map((r) => r.split("/")[0].trim()).filter(Boolean);
 
   const { jobs, errors } = queries.length
@@ -240,10 +232,10 @@ Candidate skills: ${JSON.stringify(candidateSkills)}
 Candidate roles: ${JSON.stringify(profile.roles.slice(0, 6))}
 Seniority: ${profile.seniority}`;
 
-  const { object } = await generateObject({
-    model,
+  const object = await generateStructured({
+    settings,
     schema: demandReportSchema,
-    prompt: withSchemaPrompt(demandReportSchema, settings.provider, prompt),
+    prompt,
   });
 
   return { ...object, jobCount: listings.length, usedLiveData: live, providerErrors: errors };

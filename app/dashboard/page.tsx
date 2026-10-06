@@ -30,6 +30,13 @@ export default function DashboardPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [viewing, setViewing] = useState<{
+    filename: string;
+    text: string;
+    createdAt: string;
+  } | null>(null);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function loadResumes() {
     const res = await fetch("/api/resume");
@@ -88,6 +95,38 @@ export default function DashboardPage() {
     [llm] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  async function viewResume() {
+    if (!selected) return;
+    setViewLoading(true);
+    const res = await fetch(`/api/resume/${selected.id}`);
+    const data = await res.json();
+    setViewLoading(false);
+    if (!res.ok) {
+      setError(data.error ?? "Could not load resume.");
+      return;
+    }
+    setViewing(data);
+  }
+
+  async function deleteResume() {
+    if (!selected || deleting) return;
+    if (!confirm(`Delete "${selected.filename}"? This cannot be undone.`)) return;
+    setDeleting(true);
+    const res = await fetch(`/api/resume/${selected.id}`, { method: "DELETE" });
+    setDeleting(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? "Delete failed.");
+      return;
+    }
+    const remaining = resumes.filter((r) => r.id !== selected.id);
+    setResumes(remaining);
+    const next = remaining[0] ?? null;
+    setSelected(next);
+    setResumeId(next?.id ?? null);
+    setNotice(`Deleted "${selected.filename}".`);
+  }
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -104,7 +143,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="font-serif text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="mt-1 text-sm text-zinc-500">
           Upload a resume and configure your LLM provider. Your API key stays in
           this browser session only.
@@ -117,8 +156,8 @@ export default function DashboardPage() {
         <h2 className="mb-3 text-lg font-medium">Resume</h2>
         <div
           {...getRootProps()}
-          className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
-            isDragActive ? "border-zinc-900 bg-zinc-100" : "border-zinc-300 bg-white hover:border-zinc-400"
+          className={`cursor-pointer rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+            isDragActive ? "border-accent bg-accent-soft" : "border-zinc-300 bg-white hover:border-zinc-400"
           } ${busy ? "opacity-60" : ""}`}
         >
           <input {...getInputProps()} />
@@ -145,8 +184,8 @@ export default function DashboardPage() {
 
         {resumes.length > 0 && (
           <div className="mt-4">
-            <label className="block text-sm">
-              <span className="mb-1 block text-zinc-500">Active resume</span>
+            <span className="mb-1 block text-sm text-zinc-500">Active resume</span>
+            <div className="flex flex-wrap items-center gap-2">
               <select
                 value={selected?.id ?? ""}
                 onChange={(e) => {
@@ -162,13 +201,27 @@ export default function DashboardPage() {
                   </option>
                 ))}
               </select>
-            </label>
+              <button
+                onClick={viewResume}
+                disabled={!selected || viewLoading}
+                className="rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+              >
+                {viewLoading ? "Loading…" : "View text"}
+              </button>
+              <button
+                onClick={deleteResume}
+                disabled={!selected || deleting}
+                className="rounded-md border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+            </div>
           </div>
         )}
       </section>
 
       {profile && (
-        <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-lg font-medium">Extracted profile</h2>
             <span className="text-xs text-zinc-400">
@@ -192,7 +245,7 @@ export default function DashboardPage() {
                   {asArray(profile.roles).map((r) => (
                     <span
                       key={r}
-                      className="rounded-full bg-zinc-900 px-2.5 py-0.5 text-xs text-white"
+                      className="rounded-full bg-accent px-2.5 py-0.5 text-xs text-white"
                     >
                       {r}
                     </span>
@@ -230,11 +283,63 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
+            {(profile.experience?.length ?? 0) > 0 && (
+              <div>
+                <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  Work history
+                </h3>
+                <ul className="space-y-1">
+                  {(profile.experience ?? []).map((e, i) => (
+                    <li key={i} className="text-zinc-600">
+                      <span className="font-medium text-zinc-800">{e.role}</span>
+                      {" — "}
+                      {e.company}
+                      <span className="text-zinc-400">
+                        {" · "}
+                        {e.startDate ?? "?"}
+                        {" – "}
+                        {e.endDate ?? "Present"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </section>
       )}
 
       <CoachWidget />
+
+      {viewing && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setViewing(null)}
+        >
+          <div
+            className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-3">
+              <div>
+                <h3 className="font-medium">{viewing.filename}</h3>
+                <p className="text-xs text-zinc-500">
+                  Uploaded {new Date(viewing.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <button
+                onClick={() => setViewing(null)}
+                className="rounded-md border border-zinc-300 px-3 py-1 text-sm text-zinc-600 hover:bg-zinc-50"
+              >
+                Close
+              </button>
+            </div>
+            <pre className="flex-1 overflow-y-auto p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-zinc-700">
+              {viewing.text}
+            </pre>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

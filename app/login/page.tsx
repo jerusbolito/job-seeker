@@ -29,8 +29,14 @@ function LoginForm() {
 
   return (
     <div className="mx-auto max-w-sm pt-16">
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+      <Link
+        href="/"
+        className="mb-6 block text-center font-serif text-2xl font-semibold tracking-tight"
+      >
+        JobSeeker
+      </Link>
+      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
+        <h1 className="font-serif text-2xl font-semibold tracking-tight">Sign in</h1>
         <p className="mt-1 text-sm text-zinc-500">Welcome back to JobSeeker.</p>
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <label className="block text-sm">
@@ -57,7 +63,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-zinc-900 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+          className="w-full rounded-md bg-accent py-2.5 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>

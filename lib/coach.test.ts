@@ -11,6 +11,7 @@ const baseProfile: ResumeProfile = {
   roles: ["Engineer"],
   keywords: [],
   summary: "",
+  experience: [],
 };
 
 describe("parseLearned", () => {

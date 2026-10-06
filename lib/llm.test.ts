@@ -50,6 +50,7 @@ describe("resumeProfileSchema", () => {
     roles: ["Engineer"],
     keywords: ["python"],
     summary: "…",
+    experience: [],
   };
 
   it("accepts a valid profile", () => {

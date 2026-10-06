@@ -13,7 +13,7 @@ export default function LlmSettingsForm() {
   const preset = PROVIDER_PRESETS[llm.provider];
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-medium">LLM Settings</h3>
         <span className="text-xs text-zinc-400">Stored for this session only</span>
